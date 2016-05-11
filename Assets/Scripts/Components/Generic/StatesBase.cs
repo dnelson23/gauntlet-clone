@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.Components
+﻿namespace Assets.Scripts.Components.Generic
 {
     public abstract class StatesBase<T>
     {

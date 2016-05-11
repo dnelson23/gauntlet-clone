@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.Scripts.Components
+namespace Assets.Scripts.Components.Generic
 {
     class Bullet : CustomComponentBase
     {

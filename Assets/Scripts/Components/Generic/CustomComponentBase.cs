@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Scripts.Components
+namespace Assets.Scripts.Components.Generic
 {
     /*
      * Base class for custom components

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Assets.Scripts.Components
+namespace Assets.Scripts.Components.Generic
 {
     /*
      * Simple 2D vector movement script.

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Assets.Scripts.Components
+namespace Assets.Scripts.Components.Generic
 {
     /*
      * Base Controller class for creating object controllers
