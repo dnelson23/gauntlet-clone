@@ -6,37 +6,43 @@ namespace Assets.Scripts.Hero
 {
     public abstract class HeroBase : Components.Generic.CustomComponentBase
     {
-        Components.HeroType _type;
+        // Player Number for imput and score purposes
+        public int PortNum;
+
+        protected Components.HeroType _type;
         public Components.HeroType Type
         {
             get { return _type; }
             private set { _type = value; }
         }
 
-        HeroState _state;
+        protected HeroState _state;
         public HeroState.State State
         {
             get { return _state.currentState; }
             private set { _state.ChangeState(value); }
         }
 
-        Components.Generic.HitPoints _hitPoints;
+        protected Components.Generic.HitPoints _hitPoints;
         public float CurHitPoints
         {
             get { return _hitPoints.curHitPoints; }
         }
+        protected float maxHealth;
 
-        Components.Generic.VectorMovement2D _movement;
-        float speed;
+        protected Components.Generic.VectorMovement2D _movement;
+        protected float speed;
 
-        Components.Generic.Weapon _weapon;
-        float fireRate;
+        protected Components.Generic.Weapon _weapon;
+        protected float fireRate;
+        protected float damage;
 
-        float damage;
+        protected Input.InputManager _input;
 
         void GetInput(ref float x, ref float y)
         {
-
+            x = _input.GetHorizontalAxis();
+            y = _input.GetVerticalAxis();
         }
     }
 }
