@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Assets.Scripts.Enemy
 {
-    public abstract class EnemyBase : Components.ControllerBase
+    public abstract class EnemyBase : Components.Generic.ControllerBase
     {
-        Components.HitPoints _health;
+        Components.Generic.HitPoints _health;
         protected float maxHP = 100f;
         public float CurrentHP
         {
@@ -13,7 +13,7 @@ namespace Assets.Scripts.Enemy
             private set { _health.SetMaxHitPoints(value); }
         }
 
-        Components.VectorMovement2D _movement;
+        Components.Generic.VectorMovement2D _movement;
 
         protected float damage = 100f;
 
@@ -21,9 +21,9 @@ namespace Assets.Scripts.Enemy
         {
             base.Awake();
 
-            _movement = _parent.gameObject.AddComponent<Components.VectorMovement2D>();
+            _movement = _parent.gameObject.AddComponent<Components.Generic.VectorMovement2D>();
 
-            _health = _parent.gameObject.AddComponent<Components.HitPoints>();
+            _health = _parent.gameObject.AddComponent<Components.Generic.HitPoints>();
             CurrentHP = maxHP;
         }
         
