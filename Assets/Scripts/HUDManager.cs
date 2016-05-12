@@ -8,7 +8,7 @@ namespace Assets.Scripts
 {
     class PlayerHUD
     {
-        GameObject ParentObj;
+        public GameObject Parent;
         public Text Name;
         public Text HealthNum;
         public GameObject[] Keys = new GameObject[4];
@@ -16,7 +16,7 @@ namespace Assets.Scripts
 
         public PlayerHUD(GameObject parent, Text name, Text health, GameObject[] keys, GameObject[] potions)
         {
-            ParentObj = parent;
+            Parent = parent;
             Name = name;
             HealthNum = health;
             Keys = keys;
@@ -42,7 +42,13 @@ namespace Assets.Scripts
             { 4, null }
         };
 
+        GameObject[] PlayerMenus = new GameObject[4];
+        GameObject Menu;
+        GameObject JoinGameTxt;
+        GameObject StartGameTxt;
+
         GameObject HealthNotice;
+        GameObject DeathNotice;
         GameObject PauseScreen;
 
         int num = 1;
@@ -51,22 +57,24 @@ namespace Assets.Scripts
         {
             InitPlayerHUDs();
 
+            // Set menu huds
+            for (int i = 1; i <= 4; i++)
+            {
+                PlayerMenus[i - 1] = GameObject.Find("P" + i + "Menu");
+            }
+            Menu = GameObject.Find("Menu");
+            JoinGameTxt = GameObject.Find("JoinGameTxt");
+            StartGameTxt = GameObject.Find("StartGameTxt");
+            StartGameTxt.SetActive(false);
+
             PauseScreen = GameObject.Find("PauseScreen");
             PauseScreen.SetActive(false);
 
             HealthNotice = GameObject.Find("HealthNotification");
             HealthNotice.SetActive(false);
-        }
 
-        void Update()
-        {
-        }
-
-        public void TogglePauseScreen()
-        {
-            bool stateToToggle = PauseScreen.activeSelf ? false : true;
-            Debug.Log(stateToToggle);
-            PauseScreen.SetActive(stateToToggle);
+            DeathNotice = GameObject.Find("DeathNotification");
+            DeathNotice.SetActive(false);
         }
 
         void InitPlayerHUDs()
@@ -93,20 +101,63 @@ namespace Assets.Scripts
                     pots[itemNum].SetActive(false);
                 }
 
+                parent.SetActive(false);
                 PlayerHUDs[player] = new PlayerHUD(parent, name, health, keys, pots);
             }
         }
 
-        public void ShowLowHealth(int player)
+        public void ShowStartText()
+        {
+            if(JoinGameTxt.activeSelf)
+            {
+                JoinGameTxt.SetActive(false);
+            }
+
+            StartGameTxt.SetActive(true);
+        }
+
+        public void HideMenu()
+        {
+            Menu.SetActive(false);
+        }
+
+        public void ShowMenuHUD()
+        {
+            Menu.SetActive(true);
+        }
+
+        public void HidePlayerMenu(int player)
+        {
+            PlayerMenus[player - 1].SetActive(false);
+        }
+
+        public void ShowPlayerHUD(int player)
+        {
+            PlayerHUDs[player].Parent.SetActive(true);
+            UpdatePlayerHealth(player);
+        }
+
+        public void UpdatePlayerHealth(int player)
+        {
+            PlayerHUDs[player].HealthNum.text = SceneManager.Players[player].CurHitPoints.ToString();
+        }
+
+        #region Notifications
+        public void ShowLowHealth(string player)
         {
             StartCoroutine(LowHealthNotification(player));
         }
 
-        IEnumerator LowHealthNotification(int player)
+        IEnumerator LowHealthNotification(string player)
         {
+            while(DeathNotice.activeSelf)
+            {
+                yield return 0;
+            }
+
             HealthNotice.SetActive(true);
             CanvasGroup cGroup = HealthNotice.GetComponent<CanvasGroup>();
-            string notification = PlayerHUDs[player].Name.text + "s Health is running out!";
+            string notification = player + "s Health is running out!";
             HealthNotice.GetComponentInChildren<Text>().text = notification;
             yield return new WaitForSeconds(3);
 
@@ -118,6 +169,46 @@ namespace Assets.Scripts
 
             cGroup.alpha = 1;
             HealthNotice.SetActive(false);
+        }
+
+        public void ShowPlayerDied(string player)
+        {
+            StartCoroutine(PlayerDeathNotification(player));
+        }
+
+        IEnumerator PlayerDeathNotification(string player)
+        {
+            while(HealthNotice.activeSelf)
+            {
+                yield return 0;
+            }
+
+            DeathNotice.SetActive(true);
+            CanvasGroup cGroup = DeathNotice.GetComponent<CanvasGroup>();
+            string notification = player + " has died!";
+            DeathNotice.GetComponentInChildren<Text>().text = notification;
+            yield return new WaitForSeconds(3);
+
+            while (cGroup.alpha > 0)
+            {
+                cGroup.alpha -= 0.05f;
+                yield return new WaitForEndOfFrame();
+            }
+
+            cGroup.alpha = 1;
+            DeathNotice.SetActive(false);
+        }
+        #endregion
+
+        public void TogglePauseScreen()
+        {
+            bool stateToToggle = PauseScreen.activeSelf ? false : true;
+            PauseScreen.SetActive(stateToToggle);
+        }
+
+        public void UpdatePauseScreen(string name)
+        {
+            PauseScreen.GetComponentInChildren<Text>().text = "-- " + name + " Pause --";
         }
 
         public void ShowPlayerKey(int player, int key)

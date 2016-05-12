@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Assets.Scripts
@@ -14,13 +15,15 @@ namespace Assets.Scripts
         }
         #endregion
 
-        public enum SceneState { Menu, Play, Pause };
+        public enum SceneState { Menu, Play, Pause, Transition };
 
-        private static SceneState _gameState = SceneState.Play;
+        private static SceneState _gameState = SceneState.Menu;
         public static SceneState GameState
         {
             get { return _gameState; }
         }
+
+        int pausedPlayer;
 
         public static Dictionary<int, Hero.HeroBase> Players = new Dictionary<int, Hero.HeroBase>
         {
@@ -30,8 +33,15 @@ namespace Assets.Scripts
             { 4, null }
         };
 
+        Vector3[] playerSpawnPoints = new Vector3[4]
+        {
+            new Vector3(1, 0, 0),
+            new Vector3(0, 0, 1),
+            new Vector3(-1, 0, 0),
+            new Vector3(0, 0, -1)
+        };
+
         static Enemy.EnemyBase[] enemies;
-        public static bool IsGameStarted = false;
 
         public static bool IsPlayerAdded()
         {
@@ -54,72 +64,146 @@ namespace Assets.Scripts
         void Awake()
         {
             _instance = null;
+            
         }
 
         void Start()
         {
             enemies = GameObject.FindObjectsOfType<Enemy.EnemyBase>();
+            Time.timeScale = 0;
         }
 
         void Update()
         {
-            if (Input.InputManager.GetJoinGame(1) && IsPlayerAdded(1))
+            switch(_gameState)
             {
-
+                case SceneState.Menu:
+                    DoMenuState();
+                    break;
+                case SceneState.Play:
+                    DoPlayState();
+                    break;
+                case SceneState.Pause:
+                    DoPauseState();
+                    break;
+                default:
+                    break;
             }
+        }
 
-            if (Input.InputManager.GetJoinGame(2) && IsPlayerAdded(2))
+        void DoMenuState()
+        {
+            for (int pIndex = 1; pIndex <= 4; pIndex++)
             {
-
-            }
-
-            if (Input.InputManager.GetJoinGame(3) && IsPlayerAdded(3))
-            {
-
-            }
-
-            if (Input.InputManager.GetJoinGame(4) && IsPlayerAdded(4))
-            {
-
-            }
-
-            if(UnityEngine.Input.GetKeyDown(KeyCode.Space))
-            {
-                HUDManager.Instance.TogglePauseScreen();
-                switch(_gameState)
+                // Check if joined players starts game
+                if (Input.InputManager.GetStart(pIndex) && IsPlayerAdded(pIndex))
                 {
-                    case SceneState.Play:
-                        Time.timeScale = 0;
-                        _gameState = SceneState.Pause;
-                        break;
-                    case SceneState.Pause:
-                        Time.timeScale = 1;
-                        _gameState = SceneState.Play;
-                        break;
+                    BeginGame();
                 }
+
+                // Check for joining players
+                if (Input.InputManager.GetStart(pIndex) && !IsPlayerAdded(pIndex))
+                {
+                    Players[pIndex] = AddPlayer((Components.HeroType)pIndex - 1);
+                    HUDManager.Instance.ShowStartText();
+                    HUDManager.Instance.HidePlayerMenu(pIndex);
+                    HUDManager.Instance.ShowPlayerHUD(pIndex);
+                }
+            }
+        }
+
+        void DoPlayState()
+        {
+        }
+
+        void DoPauseState()
+        {
+            if(Input.InputManager.GetStart(pausedPlayer))
+            {
+                TogglePause(pausedPlayer);
+            }
+        }
+
+        void BeginGame()
+        {
+            HUDManager.Instance.HideMenu();
+            _gameState = SceneState.Play;
+            Time.timeScale = 1f;
+        }
+
+        public void TogglePause(int player)
+        {
+            HUDManager.Instance.TogglePauseScreen();
+            pausedPlayer = player;
+            switch (_gameState)
+            {
+                case SceneState.Play:
+                    HUDManager.Instance.UpdatePauseScreen(Players[player].Type.ToString());
+                    TransitionSceneState(SceneState.Pause);
+                    break;
+                case SceneState.Pause:
+                    if (pausedPlayer == player)
+                    {
+                        TransitionSceneState(SceneState.Play);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        IEnumerator TransitionSceneState(SceneState newState)
+        {
+            _gameState = SceneState.Transition;
+            yield return new WaitForSeconds(0.5f);
+            _gameState = newState;
+            if(newState == SceneState.Play)
+            {
+                Time.timeScale = 1f;
+            }
+            else if(newState == SceneState.Pause)
+            {
+                Time.timeScale = 0f;
             }
         }
 
         Hero.HeroBase AddPlayer(Components.HeroType newType)
         {
-            GameObject newHero = Resources.Load<GameObject>(newType.ToString());
-
-            if(newHero == null)
+            string prefabPath = Hero.HeroBase.HeroResourcePath[(int)newType];
+            GameObject heroPrefab = Resources.Load<GameObject>(prefabPath);
+            
+            if(heroPrefab == null)
             {
                 Debug.Log("Could not load hero prefab for " + newType.ToString());
                 return null;
             }
 
-            if(IsGameStarted)
+            Vector3 spawnPos = Vector3.zero;
+
+            if(_gameState == SceneState.Menu)
             {
-                Vector3 newPos = FindClosestSpawnPoint();
+                spawnPos = playerSpawnPoints[(int)newType];
             }
-            else
+            else if(_gameState == SceneState.Play)
             {
-                newHero.transform.position = Vector3.zero;
+                spawnPos = FindClosestSpawnPoint();
             }
 
+            GameObject newHero = GameObject.Instantiate<GameObject>(heroPrefab);
+            newHero.transform.position = spawnPos;
             return newHero.GetComponent<Hero.HeroBase>();
+        }
+
+        public void PlayerIsLowHealth(int pNum)
+        {
+            string pName = Players[pNum].Type.ToString();
+            HUDManager.Instance.ShowLowHealth(pName);
+        }
+
+        public void PlayerDied(int pNum)
+        {
+            string pName = Players[pNum].Type.ToString();
+            HUDManager.Instance.ShowPlayerDied(pName);
         }
 
         Vector3 FindClosestSpawnPoint()
