@@ -2,7 +2,7 @@
 {
     public enum HeroType
     {
-        Wizard, Elf, Warrior, Valkyrie
+        Warrior, Wizard, Elf, Valkyrie
     }
 
     public enum EnemyType
