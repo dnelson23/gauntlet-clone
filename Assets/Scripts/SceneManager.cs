@@ -14,7 +14,15 @@ namespace Assets.Scripts
         }
         #endregion
 
-        static Dictionary<int, Hero.HeroBase> _players = new Dictionary<int, Hero.HeroBase>
+        public enum SceneState { Menu, Play, Pause };
+
+        private static SceneState _gameState = SceneState.Play;
+        public static SceneState GameState
+        {
+            get { return _gameState; }
+        }
+
+        public static Dictionary<int, Hero.HeroBase> Players = new Dictionary<int, Hero.HeroBase>
         {
             { 1, null },
             { 2, null },
@@ -27,8 +35,8 @@ namespace Assets.Scripts
 
         public static bool IsPlayerAdded()
         {
-            if(_players[1] == null && _players[2] == null &&
-               _players[3] == null && _players[4] == null)
+            if(Players[1] == null && Players[2] == null &&
+               Players[3] == null && Players[4] == null)
             {
                 return true;
             }
@@ -40,7 +48,7 @@ namespace Assets.Scripts
 
         public static bool IsPlayerAdded(int port)
         {
-            return _players[port] == null ? false : true;
+            return Players[port] == null ? false : true;
         }
 
         void Awake()
@@ -74,6 +82,22 @@ namespace Assets.Scripts
             {
 
             }
+
+            if(UnityEngine.Input.GetKeyDown(KeyCode.Space))
+            {
+                HUDManager.Instance.TogglePauseScreen();
+                switch(_gameState)
+                {
+                    case SceneState.Play:
+                        Time.timeScale = 0;
+                        _gameState = SceneState.Pause;
+                        break;
+                    case SceneState.Pause:
+                        Time.timeScale = 1;
+                        _gameState = SceneState.Play;
+                        break;
+                }
+            }
         }
 
         Hero.HeroBase AddPlayer(Components.HeroType newType)
@@ -101,19 +125,22 @@ namespace Assets.Scripts
         Vector3 FindClosestSpawnPoint()
         {
             int liveHero = 0;
-            if (IsPlayerAdded(1) && _players[1].CurHitPoints > 0) { liveHero = 1; }
-            else if (IsPlayerAdded(2) && _players[2].CurHitPoints > 0) { liveHero = 2; }
-            else if (IsPlayerAdded(3) && _players[3].CurHitPoints > 0) { liveHero = 3; }
-            else if (IsPlayerAdded(4) && _players[4].CurHitPoints > 0) { liveHero = 4; }
+            if (IsPlayerAdded(1) && Players[1].CurHitPoints > 0) { liveHero = 1; }
+            else if (IsPlayerAdded(2) && Players[2].CurHitPoints > 0) { liveHero = 2; }
+            else if (IsPlayerAdded(3) && Players[3].CurHitPoints > 0) { liveHero = 3; }
+            else if (IsPlayerAdded(4) && Players[4].CurHitPoints > 0) { liveHero = 4; }
             else { return Vector3.zero; }
 
             Vector3 desiredPos = Vector3.zero;
-            RaycastHit hit;
-
             for(int i = 0; i < 360; i++)
             {
-                desiredPos = new Vector3(Mathf.Cos(i), 0f, Mathf.Sin(i));
-                if(!Physics.SphereCast(_players[liveHero].transform.position + desiredPos, 0.5f, Vector3.zero, out hit))
+                // convert degrees to rads
+                float x = Mathf.Cos(i * (Mathf.PI / 180));
+                float z = Mathf.Sin(i * (Mathf.PI/180));
+
+                desiredPos = Players[liveHero].transform.position + new Vector3(x, 0f, z);
+                Debug.Log("Check " + i + ": " + desiredPos);
+                if(Physics.OverlapSphere(desiredPos, 0.5f).Length == 0)
                 {
                     return desiredPos;
                 }
