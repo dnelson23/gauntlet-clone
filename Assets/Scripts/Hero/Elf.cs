@@ -1,16 +1,20 @@
 ﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Assets.Scripts.Hero
 {
     class Elf : HeroBase
     {
+        public float ElfSpeed = 0.01f;
+        public float ElfFireRate = 0.5f;
+        public float ElfDamage = 75f;
+
         void Start()
         {
-            speed = 1.3f;
-            damage = 75f;
+            speed = ElfSpeed;
+            fireRate = ElfFireRate;
+            damage = ElfDamage;
         }
     }
 }

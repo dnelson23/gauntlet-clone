@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Components.Generic
 {
-    class HitPoints : CustomComponentBase
+    public class HitPoints : CustomComponentBase
     {
         public float curHitPoints { get; private set; }
         float maxHitPoints;

@@ -2,7 +2,7 @@
 
 namespace Assets.Scripts.Components.Generic
 {
-    class Weapon : CustomComponentBase
+    public class Weapon : CustomComponentBase
     {
         GameObject BulletPrefab;
         
