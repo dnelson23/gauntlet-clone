@@ -5,12 +5,12 @@ namespace Assets.Scripts.Input
 {
     public class InputManager : MonoBehaviour
     {
+        int _controllerIndex;
+
         public static bool GetStart(int port)
         {
             return UnityEngine.Input.GetButtonDown("P" + port + "Start");
         }
-
-        int _controllerIndex;
 
         public void SetPortNum(int port)
         {

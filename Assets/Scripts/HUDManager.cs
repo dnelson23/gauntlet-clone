@@ -49,6 +49,7 @@ namespace Assets.Scripts
 
         GameObject HealthNotice;
         GameObject DeathNotice;
+        GameObject SpawnNotice;
         GameObject PauseScreen;
 
         int num = 1;
@@ -75,6 +76,9 @@ namespace Assets.Scripts
 
             DeathNotice = GameObject.Find("DeathNotification");
             DeathNotice.SetActive(false);
+
+            SpawnNotice = GameObject.Find("SpawnNotification");
+            SpawnNotice.SetActive(false);
         }
 
         void InitPlayerHUDs()
@@ -150,7 +154,7 @@ namespace Assets.Scripts
 
         IEnumerator LowHealthNotification(string player)
         {
-            while(DeathNotice.activeSelf)
+            while(DeathNotice.activeSelf || SpawnNotice.activeSelf)
             {
                 yield return 0;
             }
@@ -178,7 +182,7 @@ namespace Assets.Scripts
 
         IEnumerator PlayerDeathNotification(string player)
         {
-            while(HealthNotice.activeSelf)
+            while(HealthNotice.activeSelf || SpawnNotice.activeSelf)
             {
                 yield return 0;
             }
@@ -197,6 +201,34 @@ namespace Assets.Scripts
 
             cGroup.alpha = 1;
             DeathNotice.SetActive(false);
+        }
+
+        public void ShowCantSpawn(string player)
+        {
+            StartCoroutine(PlayerSpawnNotification(player));
+        }
+
+        IEnumerator PlayerSpawnNotification(string player)
+        {
+            while (HealthNotice.activeSelf || DeathNotice.activeSelf)
+            {
+                yield return 0;
+            }
+
+            SpawnNotice.SetActive(true);
+            CanvasGroup cGroup = SpawnNotice.GetComponent<CanvasGroup>();
+            string notification = player + " cannot spawn, too many enemies!";
+            SpawnNotice.GetComponentInChildren<Text>().text = notification;
+            yield return new WaitForSeconds(3);
+
+            while (cGroup.alpha > 0)
+            {
+                cGroup.alpha -= 0.05f;
+                yield return new WaitForEndOfFrame();
+            }
+
+            cGroup.alpha = 1;
+            SpawnNotice.SetActive(false);
         }
         #endregion
 

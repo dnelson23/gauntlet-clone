@@ -24,6 +24,7 @@ namespace Assets.Scripts
         }
 
         int pausedPlayer;
+        bool justPaused = false;
 
         public static Dictionary<int, Hero.HeroBase> Players = new Dictionary<int, Hero.HeroBase>
         {
@@ -114,10 +115,30 @@ namespace Assets.Scripts
 
         void DoPlayState()
         {
+            foreach(Enemy.EnemyBase eObj in enemies)
+            {
+                eObj.isVisible = eObj.GetComponent<Renderer>().IsVisibleFrom(Camera.main);
+            }
+
+            for(int pNum = 1; pNum <= 4; pNum++)
+            {
+                if(Players[pNum] == null && Input.InputManager.GetStart(pNum))
+                {
+                    Components.HeroType hType = (Components.HeroType)(pNum - 1);
+                    Players[pNum] = AddPlayer(hType);
+                    if(Players[pNum] != null)
+                    {
+                        HUDManager.Instance.HidePlayerMenu(pNum);
+                        HUDManager.Instance.ShowPlayerHUD(pNum);
+                    }
+                }
+            }
         }
 
         void DoPauseState()
         {
+            if (justPaused) { justPaused = false;  return; }
+
             if(Input.InputManager.GetStart(pausedPlayer))
             {
                 TogglePause(pausedPlayer);
@@ -139,31 +160,19 @@ namespace Assets.Scripts
             {
                 case SceneState.Play:
                     HUDManager.Instance.UpdatePauseScreen(Players[player].Type.ToString());
-                    TransitionSceneState(SceneState.Pause);
+                    _gameState = SceneState.Pause;
+                    Time.timeScale = 0f;
+                    justPaused = true;
                     break;
                 case SceneState.Pause:
                     if (pausedPlayer == player)
                     {
-                        TransitionSceneState(SceneState.Play);
+                        _gameState = SceneState.Play;
+                        Time.timeScale = 1f;
                     }
                     break;
                 default:
                     break;
-            }
-        }
-
-        IEnumerator TransitionSceneState(SceneState newState)
-        {
-            _gameState = SceneState.Transition;
-            yield return new WaitForSeconds(0.5f);
-            _gameState = newState;
-            if(newState == SceneState.Play)
-            {
-                Time.timeScale = 1f;
-            }
-            else if(newState == SceneState.Pause)
-            {
-                Time.timeScale = 0f;
             }
         }
 
@@ -187,6 +196,12 @@ namespace Assets.Scripts
             else if(_gameState == SceneState.Play)
             {
                 spawnPos = FindClosestSpawnPoint();
+            }
+
+            if(spawnPos == Vector3.zero)
+            {
+                HUDManager.Instance.ShowCantSpawn(newType.ToString());
+                return null;
             }
 
             GameObject newHero = GameObject.Instantiate<GameObject>(heroPrefab);
@@ -215,22 +230,22 @@ namespace Assets.Scripts
             else if (IsPlayerAdded(4) && Players[4].CurHitPoints > 0) { liveHero = 4; }
             else { return Vector3.zero; }
 
-            Vector3 desiredPos = Vector3.zero;
-            for(int i = 0; i < 360; i++)
+            Vector3 spawnPos = Vector3.zero;
+            Vector3 desiredPos;
+            for (int i = 0; i < 360; i++)
             {
                 // convert degrees to rads
                 float x = Mathf.Cos(i * (Mathf.PI / 180));
-                float z = Mathf.Sin(i * (Mathf.PI/180));
+                float z = Mathf.Sin(i * (Mathf.PI / 180));
 
                 desiredPos = Players[liveHero].transform.position + new Vector3(x, 0f, z);
-                Debug.Log("Check " + i + ": " + desiredPos);
-                if(Physics.OverlapSphere(desiredPos, 0.5f).Length == 0)
+                if (Physics.OverlapSphere(desiredPos, 0.5f).Length == 0)
                 {
                     return desiredPos;
                 }
             }
 
-            return desiredPos;
+            return spawnPos;
         }
     }
 }
