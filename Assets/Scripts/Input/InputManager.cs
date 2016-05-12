@@ -3,43 +3,43 @@ using UnityEngine;
 
 namespace Assets.Scripts.Input
 {
-    class InputManager : MonoBehaviour
+    public class InputManager : MonoBehaviour
     {
         public static bool GetJoinGame(int port)
         {
-            return UnityEngine.Input.GetButtonDown(port + "Start");
+            return UnityEngine.Input.GetButtonDown("P" + port + "Start");
         }
 
         int _controllerIndex;
 
-        public InputManager(int portNum)
+        public void SetPortNum(int port)
         {
-            _controllerIndex = portNum;
+            _controllerIndex = port;
         }
 
         public float GetHorizontalAxis()
         {
-            return UnityEngine.Input.GetAxis(_controllerIndex + "Hor");
+            return UnityEngine.Input.GetAxis("P" + _controllerIndex + "Hor");
         }
 
         public float GetVerticalAxis()
         {
-            return UnityEngine.Input.GetAxis(_controllerIndex + "Vert");
+            return UnityEngine.Input.GetAxis("P" + _controllerIndex + "Vert");
         }
 
         public bool IsAttacking()
         {
-            return UnityEngine.Input.GetButtonDown(_controllerIndex + "Attack");
+            return UnityEngine.Input.GetButtonDown("P" + _controllerIndex + "XButton");
         }
 
         public bool IsPausing()
         {
-            return UnityEngine.Input.GetButtonDown(_controllerIndex + "Pause");
+            return UnityEngine.Input.GetButtonDown("P" + _controllerIndex + "Start");
         }
 
         public bool IsUsingSpecial()
         {
-            return UnityEngine.Input.GetButtonDown(_controllerIndex + "Special");
+            return UnityEngine.Input.GetButtonDown("P" + _controllerIndex + "AButton");
         }
     }
 }
