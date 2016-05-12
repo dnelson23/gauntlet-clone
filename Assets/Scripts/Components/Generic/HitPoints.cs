@@ -4,6 +4,10 @@ namespace Assets.Scripts.Components.Generic
 {
     public class HitPoints : CustomComponentBase
     {
+        public delegate void HitPointsDelegate();
+        protected HitPointsDelegate OnDamage;
+        protected HitPointsDelegate OnHeal;
+
         public float curHitPoints { get; private set; }
         float maxHitPoints;
 
@@ -20,13 +24,25 @@ namespace Assets.Scripts.Components.Generic
             curHitPoints = maxHitPoints = maxHP;
         }
 
+        public void SetOnDamageEvent(HitPointsDelegate dEvent)
+        {
+            OnDamage = dEvent;
+        }
+
+        public void SetOnHealEvent(HitPointsDelegate hEvent)
+        {
+            OnHeal = hEvent;
+        }
+
         public void TakeDamage(float amount)
         {
             curHitPoints -= amount;
-            if(curHitPoints <= 0f)
+            if(curHitPoints < 0f)
             {
-                _parent.GetComponent<ControllerBase>().Destroy();
+                curHitPoints = 0f;
             }
+
+            OnDamage();
         }
 
         public void Heal(float amount)
@@ -36,6 +52,8 @@ namespace Assets.Scripts.Components.Generic
             {
                 curHitPoints = maxHitPoints;
             }
+
+            OnHeal();
         }
     }
 }

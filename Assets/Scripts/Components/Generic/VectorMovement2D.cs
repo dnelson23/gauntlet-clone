@@ -43,6 +43,7 @@ namespace Assets.Scripts.Components.Generic
         /// <param name="dir"></param>
         public void Rotate(Vector3 dir)
         {
+            if (dir == Vector3.zero) { return; }
             _parent.rotation = Quaternion.LookRotation(dir);
         }
 
