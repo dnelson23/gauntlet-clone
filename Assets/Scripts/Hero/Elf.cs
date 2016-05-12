@@ -12,6 +12,7 @@ namespace Assets.Scripts.Hero
 
         void Start()
         {
+            _type = Components.HeroType.Elf;
             speed = ElfSpeed;
             fireRate = ElfFireRate;
             damage = ElfDamage;
