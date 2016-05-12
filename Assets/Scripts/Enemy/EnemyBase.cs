@@ -17,6 +17,8 @@ namespace Assets.Scripts.Enemy
 
         protected float damage = 100f;
 
+        public bool isVisible = false;
+
         protected override void Awake()
         {
             base.Awake();
