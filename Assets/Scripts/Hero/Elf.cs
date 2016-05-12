@@ -1,8 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
-
-namespace Assets.Scripts.Hero
+﻿namespace Assets.Scripts.Hero
 {
     class Elf : HeroBase
     {
@@ -12,6 +8,7 @@ namespace Assets.Scripts.Hero
 
         void Start()
         {
+            PortNum = 3;
             _type = Components.HeroType.Elf;
             speed = ElfSpeed;
             fireRate = ElfFireRate;

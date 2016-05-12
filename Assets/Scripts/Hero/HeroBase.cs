@@ -142,9 +142,6 @@ namespace Assets.Scripts.Hero
 
         protected void Attack()
         {
-            Debug.Log("attacking");
-            return;
-
             if (fireCounter >= fireRate)
             {
                 _weapon.Fire();
