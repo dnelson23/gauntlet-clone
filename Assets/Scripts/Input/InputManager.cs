@@ -5,7 +5,7 @@ namespace Assets.Scripts.Input
 {
     public class InputManager : MonoBehaviour
     {
-        public static bool GetJoinGame(int port)
+        public static bool GetStart(int port)
         {
             return UnityEngine.Input.GetButtonDown("P" + port + "Start");
         }
