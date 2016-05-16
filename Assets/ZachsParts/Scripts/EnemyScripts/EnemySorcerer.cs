@@ -7,17 +7,14 @@ public class EnemySorcerer : EnemyBase {
 
     public float _speed = 0.04f;
 
-    private bool isShowing = true;
+    public bool isShowing = true;
     private float visibleFlashTime = 0.75f;
     private float invisibleFlashTime = 0.25f;
-
-	protected VectorMovement2D _movement;
 
     private MeshRenderer[] _renderers;
 
 	protected override void Awake(){
 		base.Awake();
-		_movement = this.gameObject.GetComponent<VectorMovement2D> ();
 
         _renderers = GetComponentsInChildren<MeshRenderer>();
 
@@ -30,9 +27,9 @@ public class EnemySorcerer : EnemyBase {
 		StartCoroutine(FlashSelf(visibleFlashTime, invisibleFlashTime));
 	}
 
-	void Update(){
-
-		if (!isVisible)
+	void FixedUpdate()
+    {
+		if (!GetComponentInChildren<Renderer>().IsVisibleFrom(Camera.main))
 			return;
 
         //2d vector movement not working
@@ -67,7 +64,6 @@ public class EnemySorcerer : EnemyBase {
             {
                 renderer.enabled = false;
             }
-            this.GetComponent<Collider>().enabled = false;
 
             yield return new WaitForSeconds(invisTime);
         }
@@ -78,7 +74,6 @@ public class EnemySorcerer : EnemyBase {
             {
                 renderer.enabled = true;
             }
-            this.GetComponent<Collider>().enabled = true;
 
             yield return new WaitForSeconds(visTime);
         }

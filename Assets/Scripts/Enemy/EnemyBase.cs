@@ -13,8 +13,6 @@ namespace Assets.Scripts.Enemy
 			private set { _health.SetMaxHitPoints(value); }
 		}
 
-		Components.Generic.VectorMovement2D _movement;
-
 		protected float damage = 100f;
 
 		public bool isVisible = false;
@@ -23,13 +21,25 @@ namespace Assets.Scripts.Enemy
 		{
 			base.Awake();
 
-			_movement = _parent.gameObject.AddComponent<Components.Generic.VectorMovement2D>();
-
 			_health = _parent.gameObject.AddComponent<Components.Generic.HitPoints>();
 			CurrentHP = maxHP;
+
+            transform.position = new Vector3(transform.position.x, 0.33f, transform.position.z);
 		}
 
 		void Update() { }
+
+        void FixedUpdate()
+        {
+            if (GetComponentInChildren<Renderer>().IsVisibleFrom(Camera.main))
+            {
+                isVisible = true;
+            }
+            else
+            {
+                isVisible = false;
+            }
+        }
 
 		public override void Destroy() { }
 
@@ -37,9 +47,10 @@ namespace Assets.Scripts.Enemy
 
         void OnCollisionStay(Collision other)
         {
-            Debug.Log("Collision");
+            Debug.Log(other.gameObject.name);
+            Hero.HeroBase player = other.gameObject.GetComponent<Hero.HeroBase>();
             Components.Generic.HitPoints playerHP = other.gameObject.GetComponent<Components.Generic.HitPoints> ();
-            if (playerHP)
+            if (player != null && playerHP != null)
             {
                 playerHP.TakeDamage (damage);
             }

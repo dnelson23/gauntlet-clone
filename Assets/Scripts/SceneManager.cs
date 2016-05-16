@@ -149,6 +149,7 @@ namespace Assets.Scripts
         {
             HUDManager.Instance.HideMenu();
             _gameState = SceneState.Play;
+            Camera.main.GetComponent<CameraFollow>().InitCamPlayers();
             Time.timeScale = 1f;
         }
 

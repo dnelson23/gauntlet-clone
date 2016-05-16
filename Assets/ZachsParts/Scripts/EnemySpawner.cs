@@ -35,7 +35,16 @@ public class EnemySpawner : ControllerBase {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
+        if(GetComponentInChildren<Renderer>().IsVisibleFrom(Camera.main))
+        {
+            isVisible = true;
+        }
+        else
+        {
+            isVisible = false;
+        }
+
 		if (isVisible) {
 			CheckForMySpawns ();
 
@@ -66,7 +75,8 @@ public class EnemySpawner : ControllerBase {
         int i = 0;
         do
         {
-            newPos = Random.insideUnitCircle * spawnRadius;
+            newPos.x = (Random.insideUnitCircle * spawnRadius).x;
+            newPos.z = (Random.insideUnitCircle * spawnRadius).y;
             newPos += this.transform.position;
 
             if (CheckSpawnPosition(newPos, 0.12f))

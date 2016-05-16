@@ -5,26 +5,19 @@ using Assets.Scripts.Components.Generic;
 
 public class EnemyGhost : EnemyBase {
 
-	protected VectorMovement2D _movementRef;
-	public float _speed = 100;
-
-
-
-	void Start(){
-		_movementRef = this.gameObject.GetComponent<VectorMovement2D> ();
-
+	public float _speed = 0.03f;
+    
+	void Start()
+    {
         damage = 3f;
 	}
 
-	void Update(){
+	void FixedUpdate(){
 
-		if (isVisible) {
+		if (GetComponentInChildren<Renderer>().IsVisibleFrom(Camera.main)) {
 			Vector3 targetLoc = FindClosestAlivePlayer ().gameObject.transform.position;
             this.transform.position = Vector3.MoveTowards(_parent.position, targetLoc, _speed);
 			this.transform.LookAt(targetLoc);
-
-            //_movementRef.SetMoveVector (FindClosestAlivePlayer ().transform.position);
-
 		}
 	}
 
