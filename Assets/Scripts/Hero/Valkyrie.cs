@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Hero
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Hero
 {
     class Valkyrie : HeroBase
     {
@@ -13,6 +15,8 @@
             speed = ValkyrieSpeed;
             fireRate = ValkyrieFireRate;
             damage = ValkyrieDamage;
+            GameObject projectile = Resources.Load<GameObject>("Projectiles/ValkyrieProjectile");
+            _weapon.SetBullet(projectile);
         }
     }
 }

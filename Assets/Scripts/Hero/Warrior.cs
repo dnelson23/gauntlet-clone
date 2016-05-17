@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Hero
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Hero
 {
     class Warrior : HeroBase
     {
@@ -13,6 +15,8 @@
             speed = WarriorSpeed;
             fireRate = WarriorFireRate;
             damage = WarriorDamage;
+            GameObject projectile = Resources.Load<GameObject>("Projectiles/WarriorProjectile");
+            _weapon.SetBullet(projectile);
         }
     }
 }

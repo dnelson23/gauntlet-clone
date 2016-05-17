@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Hero
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Hero
 {
     class Wizard : HeroBase
     {
@@ -13,6 +15,8 @@
             speed = WizSpeed;
             fireRate = WizFireRate;
             damage = WizDamage;
+            GameObject projectile = Resources.Load<GameObject>("Projectiles/ElfBullet");
+            _weapon.SetBullet(projectile);
         }
     }
 }

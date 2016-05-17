@@ -26,7 +26,7 @@ namespace Assets.Scripts
         int pausedPlayer;
         bool justPaused = false;
 
-        public static Dictionary<int, Hero.HeroBase> Players = new Dictionary<int, Hero.HeroBase>
+        public readonly Dictionary<int, Hero.HeroBase> Players = new Dictionary<int, Hero.HeroBase>
         {
             { 1, null },
             { 2, null },
@@ -42,9 +42,10 @@ namespace Assets.Scripts
             new Vector3(0, 0, -1)
         };
 
-        static Enemy.EnemyBase[] enemies;
+        Enemy.EnemyBase[] enemies;
+        EnemySpawner[] enemySpawners;
 
-        public static bool IsPlayerAdded()
+        public bool IsPlayerAdded()
         {
             if(Players[1] == null && Players[2] == null &&
                Players[3] == null && Players[4] == null)
@@ -57,20 +58,16 @@ namespace Assets.Scripts
             }
         }
 
-        public static bool IsPlayerAdded(int port)
-        {
-            return Players[port] == null ? false : true;
-        }
-
         void Awake()
         {
             _instance = null;
-            
+            _gameState = SceneState.Menu;
         }
 
         void Start()
         {
             enemies = GameObject.FindObjectsOfType<Enemy.EnemyBase>();
+            enemySpawners = GameObject.FindObjectsOfType<EnemySpawner>();
             Time.timeScale = 0;
         }
 
@@ -132,6 +129,11 @@ namespace Assets.Scripts
                         HUDManager.Instance.ShowPlayerHUD(pNum);
                     }
                 }
+
+                if (Players[pNum] != null && (Players[pNum].HasWon || Players[pNum].CurHitPoints <= 0f))
+                {
+                    PlayAgain();
+                }
             }
         }
 
@@ -177,6 +179,19 @@ namespace Assets.Scripts
             }
         }
 
+        public void DestroyEnemiesOnSCreen()
+        {
+            for(int i = 0; i < enemySpawners.Length; i++)
+            {
+                enemySpawners[i].DestroyVisibleEnemies();
+            }
+        }
+        
+        public bool IsPlayerAdded(int port)
+        {
+            return Players[port] == null ? false : true;
+        }
+
         Hero.HeroBase AddPlayer(Components.HeroType newType)
         {
             string prefabPath = Hero.HeroBase.HeroResourcePath[(int)newType];
@@ -220,6 +235,19 @@ namespace Assets.Scripts
         {
             string pName = Players[pNum].Type.ToString();
             HUDManager.Instance.ShowPlayerDied(pName);
+        }
+
+        void PlayAgain()
+        {
+            Time.timeScale = 0f;
+            HUDManager.Instance.ShowRestartScreen();
+            for(int i = 1; i <= Players.Count; i++)
+            {
+                if(Input.InputManager.GetStart(i))
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("PlayableLevel1");
+                }
+            }
         }
 
         Vector3 FindClosestSpawnPoint()

@@ -23,6 +23,7 @@ namespace Assets.Scripts.Enemy
 
 			_health = _parent.gameObject.AddComponent<Components.Generic.HitPoints>();
 			CurrentHP = maxHP;
+            _health.SetOnDamageEvent(OnDamageEvent);
 
             transform.position = new Vector3(transform.position.x, 0.33f, transform.position.z);
 		}
@@ -41,13 +42,18 @@ namespace Assets.Scripts.Enemy
             }
         }
 
+        void OnDamageEvent()
+        {
+            if(CurrentHP <= 0f)
+            {
+                GameObject.Destroy(gameObject);
+            }
+        }
+
 		public override void Destroy() { }
-
-
 
         void OnCollisionStay(Collision other)
         {
-            Debug.Log(other.gameObject.name);
             Hero.HeroBase player = other.gameObject.GetComponent<Hero.HeroBase>();
             Components.Generic.HitPoints playerHP = other.gameObject.GetComponent<Components.Generic.HitPoints> ();
             if (player != null && playerHP != null)
@@ -55,8 +61,6 @@ namespace Assets.Scripts.Enemy
                 playerHP.TakeDamage (damage);
             }
         }
-
-
 
 		//Find closest Player
 		public GameObject FindClosestAlivePlayer()

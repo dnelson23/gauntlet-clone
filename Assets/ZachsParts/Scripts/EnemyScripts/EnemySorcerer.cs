@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Assets.Scripts.Hero;
 using Assets.Scripts.Enemy;
 using Assets.Scripts.Components.Generic;
 
@@ -48,8 +49,9 @@ public class EnemySorcerer : EnemyBase {
 
 	void OnCollisionStay(Collision other)
 	{
+        HeroBase player = other.gameObject.GetComponent<HeroBase>();
 		HitPoints playerHP = other.gameObject.GetComponent<HitPoints> ();
-		if (playerHP)
+		if (player && playerHP)
 		{
 			playerHP.TakeDamage (damage);
 		}

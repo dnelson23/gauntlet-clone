@@ -33,8 +33,9 @@ namespace Assets.Scripts.Components.Generic
             if (collidedHealth)
             {
                 collidedHealth.TakeDamage(damage);
-                Destroy(gameObject);
             }
+
+            Destroy(gameObject);
         }
 
         void CheckTimeToLive()

@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Hero
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Hero
 {
     class Elf : HeroBase
     {
@@ -13,6 +15,8 @@
             speed = ElfSpeed;
             fireRate = ElfFireRate;
             damage = ElfDamage;
+            GameObject projectile = Resources.Load<GameObject>("Projectiles/ElfProjectile");
+            _weapon.SetBullet(projectile);
         }
     }
 }

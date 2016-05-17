@@ -53,6 +53,9 @@ namespace Assets.Scripts.Hero
         protected int keys = 0;
         protected int potions = 0;
 
+        public bool HasWon { get { return reachedGoal; } }
+        protected bool reachedGoal = false;
+
         protected Input.InputManager _input;
 
         protected override void Awake()
@@ -117,8 +120,22 @@ namespace Assets.Scripts.Hero
         {
             if (_input.IsAttacking())
             {
-                State = HeroState.State.Attack;
-                return;
+                _weapon.Fire();
+            }
+
+            if (_input.IsUsingSpecial())
+            {
+                if (potions > 0)
+                {
+                    SceneManager.Instance.DestroyEnemiesOnSCreen();
+                    HUDManager.Instance.HidePlayerPot(PortNum, potions);
+                    potions--;
+                }
+
+                if(potions < 0)
+                {
+                    potions = 0;
+                }
             }
 
             if (_input.GetVerticalAxis() != 0f || _input.GetHorizontalAxis() != 0f)
@@ -204,7 +221,6 @@ namespace Assets.Scripts.Hero
             }
 
             Pickups.Types type = item.Type;
-            Destroy(item.gameObject);
 
             switch(type)
             {
@@ -213,6 +229,7 @@ namespace Assets.Scripts.Hero
                     {
                         keys++;
                         HUDManager.Instance.ShowPlayerKey(PortNum, keys);
+                        Destroy(item.gameObject);
                     }
                     break;
                 case Pickups.Types.Potion:
@@ -220,10 +237,27 @@ namespace Assets.Scripts.Hero
                     {
                         potions++;
                         HUDManager.Instance.ShowPlayerPot(PortNum, potions);
+                        Destroy(item.gameObject);
+                    }
+                    break;
+                case Pickups.Types.Door:
+                    if(keys > 0)
+                    {
+                        HUDManager.Instance.HidePlayerKey(PortNum, keys);
+                        keys--;
+                        Destroy(item.gameObject);
                     }
                     break;
                 default:
                     break;
+            }
+        }
+
+        void OnTriggerEnter(Collider col)
+        {
+            if(col.gameObject.layer == 10)
+            {
+                reachedGoal = true;
             }
         }
     }

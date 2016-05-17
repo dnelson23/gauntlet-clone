@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Assets.Scripts.Enemy;
 using Assets.Scripts.Components.Generic;
 
 public class EnemySpawner : ControllerBase {
@@ -32,6 +33,7 @@ public class EnemySpawner : ControllerBase {
 	// Use this for initialization
 	void Start () {
 		myEnemies = new List<GameObject> ();
+        _health.SetOnDamageEvent(OnDamageEvent);
 	}
 	
 	// Update is called once per frame
@@ -92,12 +94,35 @@ public class EnemySpawner : ControllerBase {
 	{
 		if(myEnemies.Count > 0)
 		{
-			foreach (var enemy in myEnemies) {
-				if (enemy == null)
-					myEnemies.Remove (enemy);
-			}
+            for (int i = 0; i < myEnemies.Count; i++)
+            {
+                if(myEnemies[i] == null)
+                {
+                    myEnemies.RemoveAt(i);
+                }
+            }
 		}
 	}
+
+    public void DestroyVisibleEnemies()
+    {
+        for (int i = 0; i < myEnemies.Count; i++)
+        {
+            if (myEnemies[i].GetComponentInChildren<Renderer>().IsVisibleFrom(Camera.main))
+            {
+                GameObject.Destroy(myEnemies[i]);
+                myEnemies.RemoveAt(i);
+            }
+        }
+    }
+
+    void OnDamageEvent()
+    {
+        if(CurrentHP <= 0f)
+        {
+            GameObject.Destroy(gameObject);
+        }
+    }
 }
 
 

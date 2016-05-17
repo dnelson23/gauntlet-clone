@@ -51,11 +51,14 @@ namespace Assets.Scripts
         GameObject DeathNotice;
         GameObject SpawnNotice;
         GameObject PauseScreen;
+        GameObject RestartScreen;
 
         int num = 1;
 
         void Start()
         {
+            _instance = null;
+
             InitPlayerHUDs();
 
             // Set menu huds
@@ -79,6 +82,9 @@ namespace Assets.Scripts
 
             SpawnNotice = GameObject.Find("SpawnNotification");
             SpawnNotice.SetActive(false);
+
+            RestartScreen = GameObject.Find("RestartScreen");
+            RestartScreen.SetActive(false);
         }
 
         void InitPlayerHUDs()
@@ -88,9 +94,9 @@ namespace Assets.Scripts
                 GameObject parent = GameObject.Find("P" + player + "HUD");
                 Text name = GameObject.Find("P" + player + "Name").GetComponent<Text>();
                 Text health = GameObject.Find("P" + player + "HealthNum").GetComponent<Text>();
-                if (SceneManager.Players[player] != null)
+                if (SceneManager.Instance.Players[player] != null)
                 {
-                    health.text = SceneManager.Players[player].CurHitPoints.ToString();
+                    health.text = SceneManager.Instance.Players[player].CurHitPoints.ToString();
                 }
 
                 GameObject[] keys = new GameObject[4];
@@ -143,7 +149,7 @@ namespace Assets.Scripts
 
         public void UpdatePlayerHealth(int player)
         {
-            PlayerHUDs[player].HealthNum.text = SceneManager.Players[player].CurHitPoints.ToString();
+            PlayerHUDs[player].HealthNum.text = SceneManager.Instance.Players[player].CurHitPoints.ToString();
         }
 
         #region Notifications
@@ -241,6 +247,11 @@ namespace Assets.Scripts
         public void UpdatePauseScreen(string name)
         {
             PauseScreen.GetComponentInChildren<Text>().text = "-- " + name + " Pause --";
+        }
+
+        public void ShowRestartScreen()
+        {
+            RestartScreen.SetActive(true);
         }
 
         public void ShowPlayerKey(int player, int key)
